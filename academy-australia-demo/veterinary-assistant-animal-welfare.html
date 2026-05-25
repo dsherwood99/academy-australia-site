@@ -242,7 +242,9 @@
     try {
       const response = await fetch(form.dataset.apiEndpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 
+        'Authorization': "Bearer sp_oca_2026_a8K29sLxPq7VnD4rM2YtQ"
+        },
         body: JSON.stringify(payload)
       });
       const resultText = await response.text();
