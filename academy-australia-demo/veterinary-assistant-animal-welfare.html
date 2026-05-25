@@ -162,73 +162,102 @@
     planPanel.hidden = !isPlan;
   }
 
-  function buildStudentPayPayload() {
-    const data = new FormData(form);
-    const paymentOption = getSelectedPaymentOption();
-    const isPlan = paymentOption === 'interest_free_plan';
+function buildStudentPayPayload() {
+  const data = new FormData(form);
+  const paymentOption = getSelectedPaymentOption();
+  const isPlan = paymentOption === 'interest_free_plan';
 
-    return {
-      provider: {
-        provider_code: 'ACADEMY_AUSTRALIA',
-        provider_name: 'Academy Australia',
-        provider_order_id: 'AA-DEMO-' + Date.now(),
-        provider_enrolment_id: 'AA-ENROL-' + Date.now(),
-        source: 'academy_australia_demo_site'
-      },
-      student: {
-        first_name: data.get('first_name'),
-        last_name: data.get('last_name'),
-        email: data.get('email'),
-        mobile: data.get('mobile'),
-        date_of_birth: data.get('date_of_birth'),
-        gender: data.get('gender'),
-        address: {
-          street_address: data.get('street_address'),
-          suburb: data.get('suburb'),
-          postcode: data.get('postcode'),
-          state: data.get('state'),
-          country: data.get('country')
-        }
-      },
-      course: {
-        course_code: 'AA-VET-ANIMAL-WELFARE-BUNDLE',
-        course_name: 'Veterinary Assistant & Animal Welfare Course Bundle',
-        category: 'Animal Care',
-        displayed_price: 1450,
-        currency: 'AUD'
-      },
-      payment: isPlan ? {
-        payment_type: 'interest_free_payment_plan',
-        total_amount: 20,
-        upfront_payment: 2,
-        first_payment_date: data.get('first_payment_date'),
-        frequency: 'weekly',
-        number_of_instalments: 9,
-        instalment_amount: 2,
-        schedule_note: '$2 upfront + 9 weekly payments of $2 for API test payload'
-      } : {
-        payment_type: 'upfront_payment',
-        total_amount: 20,
-        upfront_payment: 20,
-        first_payment_date: null,
-        frequency: null,
-        number_of_instalments: 0,
-        instalment_amount: 0,
-        schedule_note: '$20 upfront API test payment'
-      },
-      card_payment: {
-        token: 'tok_demo_replace_with_processor_token',
-        processor: 'replace_with_stripe_or_pinch',
-        amount_to_charge_now: isPlan ? 2 : 20,
-        note: 'Demo page does not transmit raw card details. Replace this object with the processor token/intent ID.'
-      },
-      consents: {
-        accepted_terms: true,
-        accepted_at: new Date().toISOString(),
-        marketing_opt_in: form.querySelector('.terms-panel input[type="checkbox"]:nth-of-type(2)')?.checked || false
+  const firstPaymentDate =
+    data.get('first_payment_date') ||
+    new Date().toISOString().slice(0, 10);
+
+  return {
+    provider: {
+      provider_code: 'ACADEMYAU',
+      provider_name: 'Academy Australia',
+      provider_order_id: 'AA-DEMO-' + Date.now(),
+      provider_enrolment_id: 'AA-ENROL-' + Date.now(),
+      source: 'academy_australia_demo_site'
+    },
+
+    student: {
+      first_name: data.get('first_name'),
+      last_name: data.get('last_name'),
+      email: data.get('email'),
+      mobile: data.get('mobile'),
+      date_of_birth: data.get('date_of_birth'),
+      gender: data.get('gender'),
+      address: {
+        street_address: data.get('street_address'),
+        suburb: data.get('suburb'),
+        postcode: data.get('postcode'),
+        state: data.get('state'),
+        country: data.get('country')
       }
-    };
-  }
+    },
+
+    course: {
+      course_code: 'AA-VET-ANIMAL-WELFARE-BUNDLE',
+      course_name: 'Veterinary Assistant & Animal Welfare Course Bundle',
+      category: 'Animal Care',
+      displayed_price: 1450,
+      currency: 'AUD'
+    },
+
+    pricing: {
+      course_price: 1450,
+      test_payload_amount: isPlan ? 20 : 20,
+      upfront_payment: isPlan ? 2 : 20,
+      amount_to_finance: isPlan ? 18 : 0,
+      currency: 'AUD'
+    },
+
+    plan: {
+      payment_type: isPlan ? 'interest_free_payment_plan' : 'upfront_payment',
+      payment_frequency: isPlan ? 'Weekly' : 'Upfront',
+      number_of_instalments: isPlan ? 9 : 1,
+      instalment_amount: isPlan ? 2 : 20,
+      first_payment_date: firstPaymentDate,
+      schedule_note: isPlan
+        ? '$2 upfront + 9 weekly payments of $2 for API test payload'
+        : '$20 upfront API test payment'
+    },
+
+    payment: isPlan ? {
+      payment_type: 'interest_free_payment_plan',
+      total_amount: 20,
+      upfront_payment: 2,
+      first_payment_date: firstPaymentDate,
+      frequency: 'weekly',
+      number_of_instalments: 9,
+      instalment_amount: 2,
+      schedule_note: '$2 upfront + 9 weekly payments of $2 for API test payload'
+    } : {
+      payment_type: 'upfront_payment',
+      total_amount: 20,
+      upfront_payment: 20,
+      first_payment_date: firstPaymentDate,
+      frequency: 'upfront',
+      number_of_instalments: 1,
+      instalment_amount: 20,
+      schedule_note: '$20 upfront API test payment'
+    },
+
+    card_payment: {
+      token: 'tok_demo_replace_with_processor_token',
+      processor: 'replace_with_stripe_or_pinch',
+      amount_to_charge_now: isPlan ? 2 : 20,
+      note: 'Demo page does not transmit raw card details. Replace this object with the processor token/intent ID.'
+    },
+
+    consents: {
+      accepted_terms: true,
+      accepted_at: new Date().toISOString(),
+      marketing_opt_in:
+        form.querySelector('.terms-panel input[type="checkbox"]:nth-of-type(2)')?.checked || false
+    }
+  };
+}
 
   paymentRadios.forEach((radio) => radio.addEventListener('change', togglePaymentPanels));
   togglePaymentPanels();
