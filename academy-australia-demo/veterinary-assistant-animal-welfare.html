@@ -281,9 +281,22 @@ function buildStudentPayPayload() {
         },
         body: JSON.stringify(payload)
       });
-      const resultText = await response.text();
-      apiResult.className = response.ok ? 'api-result is-success' : 'api-result is-error';
-      apiResult.innerHTML = '<strong>' + (response.ok ? 'API test submitted.' : 'API returned an error.') + '</strong><pre>' + resultText.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])) + '</pre>';
+      
+const resultText = await response.text();
+const result = JSON.parse(resultText);
+
+if (response.ok && result.success && result.redirect_url) {
+  window.location.href = result.redirect_url;
+  return;
+}
+
+apiResult.className = response.ok ? 'api-result is-success' : 'api-result is-error';
+apiResult.innerHTML =
+  '<strong>' + (response.ok ? 'API test submitted.' : 'API returned an error.') +
+  '</strong><pre>' +
+  resultText.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])) +
+  '</pre>';
+
     } catch (error) {
       apiResult.className = 'api-result is-error';
       apiResult.innerHTML = '<strong>Could not reach the API endpoint.</strong><p>' + error.message + '</p><p>Check the endpoint URL, CORS settings and whether the API is deployed.</p>';
