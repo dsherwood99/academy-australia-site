@@ -95,9 +95,14 @@
     }
 
     .checkout-aside .payment-choice-grid {
-      grid-template-columns: 1fr;
-      gap: 9px;
-    }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.payment-choice-grid .choice-card {
+  min-height: 140px;
+}
 
     .checkout-aside .choice-card {
       padding: 10px;
