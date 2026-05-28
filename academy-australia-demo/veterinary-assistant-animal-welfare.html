@@ -256,7 +256,7 @@ function buildStudentPayPayload() {
   processor: 'Pinch',
   source_type: 'credit-card',
   token: null,
-  amount_to_charge_now: isPlan ? 25 : 1450,
+  amount_to_charge_now: isPlan ? 2 : 2,
   payment_purpose: isPlan ? 'deposit' : 'full_payment'
 },
 
@@ -354,7 +354,7 @@ function buildStudentPayPayload() {
     const payload = buildStudentPayPayload();
 
     payload.card_payment.token = pinchSourceToken;
-    payload.card_payment.amount_to_charge_now = isPlan ? 25 : 1450;
+    payload.card_payment.amount_to_charge_now = isPlan ? 2 : 2;
     payload.card_payment.payment_purpose = isPlan ? 'deposit' : 'full_payment';
 
     apiResult.textContent = 'Sending enrolment and payment token to StudentPay API...';
