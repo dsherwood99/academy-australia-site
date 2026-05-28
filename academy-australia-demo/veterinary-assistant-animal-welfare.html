@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en-AU">
 <head>
+  <script src="https://cdn.getpinch.com.au/capturejs/pinch.capture.v2.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Veterinary Assistant & Animal Welfare | Academy Australia</title>
@@ -151,6 +152,9 @@
   const planPanel = document.querySelector('.plan-panel');
   const form = document.querySelector('#studentpayApiForm');
   const apiResult = document.querySelector('#apiResult');
+  const pinchCapture = new Pinch.Capture({
+  publishableKey: "pk_live_U6Ox10jx8Sbp84bvhWpswDEq9odiO76T"
+});
 
   function getSelectedPaymentOption() {
     return document.querySelector('input[name="payment_option"]:checked').value;
@@ -239,21 +243,22 @@ function buildStudentPayPayload() {
       schedule_note: '$2 upfront + 9 weekly payments of $2 for API test payload'
     } : {
       payment_type: 'upfront_payment',
-      total_amount: 20,
-      upfront_payment: 20,
+      total_amount: 3,
+      upfront_payment: 3,
       first_payment_date: firstPaymentDate,
       frequency: 'upfront',
       number_of_instalments: 1,
-      instalment_amount: 20,
-      schedule_note: '$20 upfront API test payment'
+      instalment_amount: 33,
+      schedule_note: '$3 upfront API test payment'
     },
 
     card_payment: {
-      token: 'tok_demo_replace_with_processor_token',
-      processor: 'replace_with_stripe_or_pinch',
-      amount_to_charge_now: isPlan ? 2 : 20,
-      note: 'Demo page does not transmit raw card details. Replace this object with the processor token/intent ID.'
-    },
+  processor: 'Pinch',
+  source_type: 'credit-card',
+  token: null,
+  amount_to_charge_now: isPlan ? 25 : 1450,
+  payment_purpose: isPlan ? 'deposit' : 'full_payment'
+},
 
     consents: {
       accepted_terms: true,
@@ -268,41 +273,138 @@ function buildStudentPayPayload() {
   togglePaymentPanels();
 
   form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+  event.preventDefault();
+
+  const submitBtn = form.querySelector('.submit-btn');
+  const paymentOption = getSelectedPaymentOption();
+  const isPlan = paymentOption === 'interest_free_plan';
+  const data = new FormData(form);
+
+  apiResult.className = 'api-result is-loading';
+  apiResult.textContent = isPlan
+    ? 'Tokenising card and preparing your payment plan...'
+    : 'Tokenising card and preparing your payment...';
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Processing...';
+
+  try {
+    const cardholderName = isPlan
+      ? data.get('plan_cardholder_name')
+      : data.get('pay_now_cardholder_name');
+
+    const cardNumber = isPlan
+      ? data.get('plan_card_number')
+      : data.get('pay_now_card_number');
+
+    const expiry = isPlan
+      ? data.get('plan_expiry')
+      : data.get('pay_now_expiry');
+
+    const cvc = isPlan
+      ? data.get('plan_cvc')
+      : data.get('pay_now_cvc');
+
+    const [expiryMonthRaw, expiryYearRaw] = String(expiry || '')
+      .replace(/\s/g, '')
+      .split('/');
+
+    if (!cardholderName || !cardNumber || !expiryMonthRaw || !expiryYearRaw || !cvc) {
+      throw new Error('Please complete all card payment fields.');
+    }
+
+    const expiryMonth = expiryMonthRaw.padStart(2, '0');
+    const expiryYear =
+      expiryYearRaw.length === 2 ? `20${expiryYearRaw}` : expiryYearRaw;
+
+    const tokenResult = await pinchCapture.createToken({
+      sourceType: 'credit-card',
+      cardholderName: String(cardholderName).trim(),
+      cardNumber: String(cardNumber).replace(/\s/g, ''),
+      expiryMonth,
+      expiryYear,
+      cvc: String(cvc).trim()
+    });
+
+    console.log('Pinch card token result:', tokenResult);
+
+    const pinchSourceToken =
+      tokenResult?.token ||
+      tokenResult?.source_token ||
+      tokenResult?.sourceToken ||
+      tokenResult?.id ||
+      tokenResult?.data?.token ||
+      tokenResult?.data?.source_token ||
+      tokenResult?.data?.sourceToken ||
+      tokenResult?.data?.id ||
+      tokenResult?.payment_source?.token ||
+      tokenResult?.payment_source?.id ||
+      tokenResult?.paymentSource?.token ||
+      tokenResult?.paymentSource?.id ||
+      tokenResult?.source?.token ||
+      tokenResult?.source?.id;
+
+    if (!pinchSourceToken) {
+      throw new Error(
+        'Pinch did not return a usable card token: ' +
+        JSON.stringify(tokenResult)
+      );
+    }
+
     const payload = buildStudentPayPayload();
-    apiResult.className = 'api-result is-loading';
-    apiResult.textContent = 'Sending test payload to StudentPay API...';
+
+    payload.card_payment.token = pinchSourceToken;
+    payload.card_payment.amount_to_charge_now = isPlan ? 25 : 1450;
+    payload.card_payment.payment_purpose = isPlan ? 'deposit' : 'full_payment';
+
+    apiResult.textContent = 'Sending enrolment and payment token to StudentPay API...';
+
+    const response = await fetch(form.dataset.apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sp_academy_demo_2026'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const resultText = await response.text();
+    let result;
 
     try {
-      const response = await fetch(form.dataset.apiEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 
-        'Authorization': 'Bearer sp_academy_demo_2026'
-        },
-        body: JSON.stringify(payload)
-      });
-      
-const resultText = await response.text();
-const result = JSON.parse(resultText);
-
-if (response.ok && result.success && result.redirect_url) {
-  window.location.href = result.redirect_url;
-  return;
-}
-
-apiResult.className = response.ok ? 'api-result is-success' : 'api-result is-error';
-apiResult.innerHTML =
-  '<strong>' + (response.ok ? 'API test submitted.' : 'API returned an error.') +
-  '</strong><pre>' +
-  resultText.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])) +
-  '</pre>';
-
-    } catch (error) {
-      apiResult.className = 'api-result is-error';
-      apiResult.innerHTML = '<strong>Could not reach the API endpoint.</strong><p>' + error.message + '</p><p>Check the endpoint URL, CORS settings and whether the API is deployed.</p>';
-      console.log('StudentPay payload that would have been sent:', payload);
+      result = JSON.parse(resultText);
+    } catch {
+      throw new Error('API returned a non-JSON response: ' + resultText);
     }
-  });
+
+    if (response.ok && result.success && result.redirect_url) {
+      window.location.href = result.redirect_url;
+      return;
+    }
+
+    apiResult.className = response.ok ? 'api-result is-success' : 'api-result is-error';
+    apiResult.innerHTML =
+      '<strong>' + (response.ok ? 'API test submitted.' : 'API returned an error.') +
+      '</strong><pre>' +
+      resultText.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])) +
+      '</pre>';
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Get Started';
+
+  } catch (error) {
+    apiResult.className = 'api-result is-error';
+    apiResult.innerHTML =
+      '<strong>Payment setup failed.</strong><p>' +
+      (error.message || 'Unable to tokenise card or submit enrolment.') +
+      '</p>';
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Get Started';
+
+    console.error(error);
+  }
+});
 </script>
 </body>
 </html>
