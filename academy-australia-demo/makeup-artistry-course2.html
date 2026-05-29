@@ -51,20 +51,54 @@
     .beauty-hero .breadcrumb a,
     .beauty-hero p { color: rgba(255,255,255,.94); }
 
-    /* Hero height reduced by roughly 30% from the earlier layout */
-    .sub-hero.product-hero.beauty-hero {
-      padding: 20px 0 20px;
+    /* Compact hero override. The global styles.css applies large hero spacing,
+       so this block deliberately overrides the inherited product/sub-hero rules. */
+    main .sub-hero.product-hero.beauty-hero {
+      min-height: 0 !important;
+      height: auto !important;
+      padding: 0 !important;
+      display: block !important;
+      overflow: hidden;
     }
 
-    .beauty-hero h1 {
-      font-size: clamp(44px, 6vw, 64px);
-      line-height: .98;
-      margin-bottom: 16px;
+    main .sub-hero.product-hero.beauty-hero .container {
+      min-height: 0 !important;
+      height: auto !important;
+      padding-top: 42px !important;
+      padding-bottom: 44px !important;
     }
 
-    .beauty-hero p {
-      max-width: 740px;
-      font-size: 21px;
+    main .sub-hero.product-hero.beauty-hero .breadcrumb {
+      margin-bottom: 16px !important;
+    }
+
+    main .sub-hero.product-hero.beauty-hero .script {
+      margin: 0 0 12px !important;
+      font-size: 20px;
+    }
+
+    main .sub-hero.product-hero.beauty-hero h1 {
+      font-size: clamp(40px, 5vw, 58px) !important;
+      line-height: .96 !important;
+      margin: 0 0 16px !important;
+      max-width: 820px;
+    }
+
+    main .sub-hero.product-hero.beauty-hero p:not(.script) {
+      max-width: 720px;
+      font-size: 20px !important;
+      line-height: 1.35 !important;
+      margin: 0 0 18px !important;
+    }
+
+    main .sub-hero.product-hero.beauty-hero .badges {
+      margin-top: 0 !important;
+      gap: 8px;
+    }
+
+    main .sub-hero.product-hero.beauty-hero .badges span {
+      padding: 8px 13px !important;
+      font-size: 13px !important;
     }
 
     .beauty-layout {
@@ -74,7 +108,7 @@
       align-items: start;
     }
 
-    .content-stack {
+    .course-column {
       display: grid;
       gap: 24px;
       align-items: start;
@@ -151,6 +185,28 @@
       position: absolute;
       left: 2px;
       top: 8px;
+    }
+
+
+    .provider-panel {
+      margin-bottom: 0;
+    }
+
+    .provider-label {
+      display: inline-block;
+      background: #f6f1ef;
+      color: var(--aa-pink);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .provider-panel h2 {
+      margin-top: 0;
     }
 
     .course-detail-mini {
@@ -430,8 +486,16 @@
 
   <section class="section">
     <div class="container beauty-layout">
-      <article class="detail-card course-copy">
-        <h2>Course overview</h2>
+      <div class="course-column">
+        <article class="detail-card course-copy provider-panel">
+          <span class="provider-label">Course Provider</span>
+          <h2>Bela Beauty College</h2>
+          <p>Bela Beauty College is an Australian beauty education provider specialising in makeup artistry, beauty therapy and industry-focused training. The college delivers flexible online learning designed to help students develop practical, job-ready skills that can be applied across freelance, salon, bridal and commercial beauty environments.</p>
+          <p>This demonstration page showcases how StudentPay can integrate directly into a provider's course marketing and enrolment journey, allowing students to choose between upfront payment and flexible payment plans while maintaining the provider's existing course experience.</p>
+        </article>
+
+        <article class="detail-card course-copy">
+          <h2>Course overview</h2>
         <p>This demo product page shows how a beauty education provider can present a polished, high-conversion course page with clear course outcomes, kit options and StudentPay payment choices visible before checkout.</p>
         <p>The course is positioned for students who want to build practical makeup artistry skills for clients, events, bridal work, editorial looks or as a pathway into the broader beauty industry.</p>
 
