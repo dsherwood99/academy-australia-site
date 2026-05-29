@@ -51,60 +51,32 @@
     .beauty-hero .breadcrumb a,
     .beauty-hero p { color: rgba(255,255,255,.94); }
 
-    /* Compact hero override. The global styles.css applies large hero spacing,
-       so this block deliberately overrides the inherited product/sub-hero rules. */
-    main .sub-hero.product-hero.beauty-hero {
-      min-height: 0 !important;
-      height: auto !important;
-      padding: 0 !important;
-      display: block !important;
-      overflow: hidden;
+    /* Hero height reduced by roughly 30% from the earlier layout */
+    .sub-hero.product-hero.beauty-hero {
+      padding: 20px 0 20px;
     }
 
-    main .sub-hero.product-hero.beauty-hero .container {
-      min-height: 0 !important;
-      height: auto !important;
-      padding-top: 42px !important;
-      padding-bottom: 44px !important;
+    .beauty-hero h1 {
+      font-size: clamp(44px, 6vw, 64px);
+      line-height: .98;
+      margin-bottom: 16px;
     }
 
-    main .sub-hero.product-hero.beauty-hero .breadcrumb {
-      margin-bottom: 16px !important;
-    }
-
-    main .sub-hero.product-hero.beauty-hero .script {
-      margin: 0 0 12px !important;
-      font-size: 20px;
-    }
-
-    main .sub-hero.product-hero.beauty-hero h1 {
-      font-size: clamp(40px, 5vw, 58px) !important;
-      line-height: .96 !important;
-      margin: 0 0 16px !important;
-      max-width: 820px;
-    }
-
-    main .sub-hero.product-hero.beauty-hero p:not(.script) {
-      max-width: 720px;
-      font-size: 20px !important;
-      line-height: 1.35 !important;
-      margin: 0 0 18px !important;
-    }
-
-    main .sub-hero.product-hero.beauty-hero .badges {
-      margin-top: 0 !important;
-      gap: 8px;
-    }
-
-    main .sub-hero.product-hero.beauty-hero .badges span {
-      padding: 8px 13px !important;
-      font-size: 13px !important;
+    .beauty-hero p {
+      max-width: 740px;
+      font-size: 21px;
     }
 
     .beauty-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 34px;
+      align-items: start;
+    }
+
+    .content-stack {
+      display: grid;
+      gap: 24px;
       align-items: start;
     }
 
@@ -180,45 +152,6 @@
       left: 2px;
       top: 8px;
     }
-
-.provider-panel{
-    background:#ffffff;
-    border:1px solid rgba(0,0,0,.06);
-    border-radius:18px;
-    padding:28px;
-    margin-bottom:24px;
-    box-shadow:0 6px 20px rgba(0,0,0,.04);
-}
-
-.provider-label{
-    display:inline-block;
-    background:#f6f1ef;
-    color:#ef5b73;
-    font-size:12px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    padding:6px 10px;
-    border-radius:999px;
-    margin-bottom:12px;
-}
-
-.provider-panel h2{
-    margin:0 0 14px;
-    font-size:30px;
-    line-height:1.1;
-    color:#2f4158;
-}
-
-.provider-panel p{
-    margin:0 0 14px;
-    line-height:1.7;
-    color:#5c6780;
-}
-
-.provider-panel p:last-child{
-    margin-bottom:0;
-}
 
     .course-detail-mini {
       display: grid;
@@ -495,34 +428,8 @@
     </div>
   </section>
 
-  
-
   <section class="section">
     <div class="container beauty-layout">
-
-
-    <article class="detail-card course-copy">
-    
-
-    <h2>Bela Beauty College</h2>
-
-    <p>
-        Bela Beauty College is an Australian beauty education provider specialising in
-        makeup artistry, beauty therapy and industry-focused training. The college
-        delivers flexible online learning designed to help students develop practical,
-        job-ready skills that can be applied across freelance, salon, bridal and
-        commercial beauty environments.
-    </p>
-
-    <p>
-        This demonstration page showcases how StudentPay can integrate directly into a
-        provider's course marketing and enrolment journey, allowing students to choose
-        between upfront payment and flexible payment plans while maintaining the
-        provider's existing course experience.
-    </p>
-    </article>
-
-
       <article class="detail-card course-copy">
         <h2>Course overview</h2>
         <p>This demo product page shows how a beauty education provider can present a polished, high-conversion course page with clear course outcomes, kit options and StudentPay payment choices visible before checkout.</p>
@@ -554,7 +461,8 @@
           <div><strong>Support</strong>Mentor + student community</div>
           <div><strong>Outcome</strong>Certificate on completion</div>
         </div>
-      </article>
+        </article>
+      </div>
 
       <aside id="studentpay-checkout" class="checkout-aside">
         <div class="section-head wide checkout-head">
